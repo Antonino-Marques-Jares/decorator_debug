@@ -6,6 +6,9 @@ import inspect
 
 def _tratar_excecao(func, assinatura, e):
     """Tratamento comum de exceções para funções e métodos."""
+    import sys
+    import traceback
+    
     print(f"ERRO em {func.__name__}: {type(e).__name__}: {str(e)}")
     
     if isinstance(e, TypeError):
@@ -37,8 +40,160 @@ def _tratar_excecao(func, assinatura, e):
     elif isinstance(e, RecursionError):
         print(f"   Dica: Possível recursão infinita ou muita profundidade")
         print(f"   Limite de recursão atual: {sys.getrecursionlimit()}")
+    
+    # NOVAS EXCEÇÕES ADICIONADAS
+    elif isinstance(e, ImportError):
+        print(f"   Dica: Falha ao importar módulo/pacote")
+        if hasattr(e, 'name') and e.name:
+            print(f"   Módulo não encontrado: {e.name}")
+        if hasattr(e, 'path') and e.path:
+            print(f"   Caminho de busca: {e.path}")
+        print(f"   Verifique se o módulo está instalado (pip install) e no PYTHONPATH")
+    
+    elif isinstance(e, ModuleNotFoundError):  # Subclasse de ImportError
+        print(f"   Dica: Módulo específico não encontrado")
+        print(f"   Nome do módulo: {e.name if hasattr(e, 'name') else 'N/A'}")
+        print(f"   Dica: Execute 'pip install {e.name}' se for um pacote externo")
+    
+    elif isinstance(e, StopIteration):
+        print(f"   Dica: Iterador não tem mais elementos")
+        print(f"   Verifique se o iterador está vazio ou já foi consumido")
+    
+    elif isinstance(e, RuntimeError):
+        print(f"   Dica: Erro genérico de execução")
+        if "recursion" in str(e).lower():
+            print(f"   Possível recursão infinita detectada")
+        print(f"   Detalhes: {str(e)}")
+    
+    elif isinstance(e, NotImplementedError):
+        print(f"   Dica: Método abstrato ou funcionalidade não implementada")
+        print(f"   Implemente o método {func.__name__} na subclasse")
+    
+    elif isinstance(e, MemoryError):
+        print(f"   Dica: Memória insuficiente para a operação")
+        print(f"   Processe dados em lotes menores ou otimize estruturas")
+    
+    elif isinstance(e, OverflowError):
+        print(f"   Dica: Valor numérico muito grande para o tipo")
+        print(f"   Considere usar tipos com maior capacidade (ex: Decimal, int arbitrário)")
+    
+    elif isinstance(e, LookupError):
+        print(f"   Dica: Erro de busca em coleção")
+        print(f"   Verifique se o índice/chave existe no intervalo válido")
+    
+    elif isinstance(e, StopAsyncIteration):
+        print(f"   Dica: Iterador assíncrono não tem mais elementos")
+        print(f"   O loop async foi concluído naturalmente")
+    
+    elif isinstance(e, ConnectionError):
+        print(f"   Dica: Erro de conexão de rede")
+        if hasattr(e, 'errno'):
+            print(f"   Código de erro: {e.errno}")
+        print(f"   Verifique a conectividade e o servidor remoto")
+    
+    elif isinstance(e, TimeoutError):
+        print(f"   Dica: Operação excedeu o tempo limite")
+        print(f"   Aumente o timeout ou otimize a operação")
+    
+    elif isinstance(e, EOFError):
+        print(f"   Dica: Fim de arquivo/entrada inesperado")
+        print(f"   Verifique se há dados suficientes para leitura")
+    
+    elif isinstance(e, UnicodeError):
+        print(f"   Dica: Erro relacionado a codificação Unicode")
+        print(f"   Use encoding='utf-8' ou especifique a codificação correta")
+        if hasattr(e, 'encoding'):
+            print(f"   Encoding: {e.encoding}")
+        if hasattr(e, 'reason'):
+            print(f"   Razão: {e.reason}")
+    
+    elif isinstance(e, UnicodeEncodeError):
+        print(f"   Dica: Falha ao codificar string para bytes")
+        print(f"   Caractere problemático: {e.object[e.start:e.end] if hasattr(e, 'object') else 'N/A'}")
+        print(f"   Posição: {e.start if hasattr(e, 'start') else 'N/A'}")
+    
+    elif isinstance(e, UnicodeDecodeError):
+        print(f"   Dica: Falha ao decodificar bytes para string")
+        print(f"   Posição do erro: {e.start if hasattr(e, 'start') else 'N/A'}")
+        print(f"   Use errors='ignore' ou errors='replace' para contornar")
+    
+    elif isinstance(e, FloatingPointError):
+        print(f"   Dica: Erro de ponto flutuante")
+        print(f"   Verifique divisões por zero, overflow ou operações inválidas")
+    
+    elif isinstance(e, AssertionError):
+        print(f"   Dica: Falha em asserção (assert statement)")
+        print(f"   Expressão: {e.args[0] if e.args else 'N/A'}")
+        print(f"   Verifique pré-condições ou invariantes")
+    
+    elif isinstance(e, BufferError):
+        print(f"   Dica: Operação inválida em buffer")
+        print(f"   Verifique o estado do buffer antes da operação")
+    
+    elif isinstance(e, BrokenPipeError):
+        print(f"   Dica: Pipe quebrado - processo do outro lado fechou")
+        print(f"   Verifique se o processo receptor ainda está ativo")
+    
+    elif isinstance(e, ChildProcessError):
+        print(f"   Dica: Erro em processo filho")
+        print(f"   Verifique o código de retorno do subprocesso")
+    
+    elif isinstance(e, IsADirectoryError):
+        print(f"   Dica: Operação esperava arquivo mas recebeu diretório")
+        print(f"   Caminho: {e.filename if hasattr(e, 'filename') else 'N/A'}")
+    
+    elif isinstance(e, NotADirectoryError):
+        print(f"   Dica: Operação esperava diretório mas recebeu arquivo")
+        print(f"   Caminho: {e.filename if hasattr(e, 'filename') else 'N/A'}")
+    
+    elif isinstance(e, BlockingIOError):
+        print(f"   Dica: Recurso em modo não-bloqueante não está disponível")
+        print(f"   Aguarde ou use operações assíncronas")
+    
+    elif isinstance(e, InterruptedError):
+        print(f"   Dica: Chamada de sistema interrompida por sinal")
+        print(f"   Pode ser necessário reexecutar a operação")
+    
+    elif isinstance(e, SystemError):
+        print(f"   Dica: Erro interno do interpretador Python")
+        print(f"   Considere reportar como bug")
+    
+    elif isinstance(e, IndentationError):
+        print(f"   Dica: Erro de indentação no código")
+        print(f"   Linha: {e.lineno if hasattr(e, 'lineno') else 'N/A'}")
+        print(f"   Use espaços consistentemente (recomendado 4 espaços)")
+    
+    elif isinstance(e, TabError):
+        print(f"   Dica: Mistura de tabs e espaços na indentação")
+        print(f"   Use apenas espaços (recomendado 4 espaços)")
+    
+    elif isinstance(e, SyntaxError):
+        print(f"   Dica: Erro de sintaxe no código")
+        print(f"   Linha: {e.lineno if hasattr(e, 'lineno') else 'N/A'}")
+        print(f"   Coluna: {e.offset if hasattr(e, 'offset') else 'N/A'}")
+        if hasattr(e, 'text') and e.text:
+            print(f"   Linha com erro: {e.text.strip()}")
+    
+    elif isinstance(e, SystemExit):
+        print(f"   Dica: Chamada explícita a sys.exit()")
+        print(f"   Código de saída: {e.code if hasattr(e, 'code') else 'N/A'}")
+    
+    elif isinstance(e, KeyboardInterrupt):
+        print(f"   Dica: Programa interrompido pelo usuário (Ctrl+C)")
+        print(f"   Finalizando operação atual...")
+    
+    elif isinstance(e, GeneratorExit):
+        print(f"   Dica: Gerador fechado explicitamente")
+        print(f"   Limpeza de recursos em progresso")
+    
+    elif isinstance(e, DeprecationWarning):
+        print(f"   Dica: Uso de recurso/funcionalidade obsoleta")
+        print(f"   Atualize o código para versão mais recente")
+    
     else:
         print(f"   Exceção não específica tratada genericamente")
+        print(f"   Tipo: {type(e).__name__}")
+        print(f"   Considere adicionar tratamento específico para esta exceção")
     
     print(f"\n   Stack trace:")
     traceback.print_exc(limit=3, file=sys.stdout)
