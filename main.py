@@ -159,7 +159,7 @@ def _tratar_excecao(func, assinatura, e):
     else:
         print(f"   Exceção não específica tratada genericamente")
         print(f"   Tipo: {type(e).__name__}")
-        print(f"   Considere adicionar tratamento específico para esta exceção")
+        print(f"   Considere adicionar tratamento específico para esta exceção em _tratar_excecao")
     
     print(f"\n   Stack trace:")
     traceback.print_exc(limit=3, file=sys.stdout)
