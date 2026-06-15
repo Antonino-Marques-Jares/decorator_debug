@@ -207,7 +207,30 @@ def debug_oo(metodo):
             )
         
         obj = args[0]
-        obj_str = str(obj)
+        
+        # Verifica se a classe implementa o método __str__ (não herdado de object)
+        if not hasattr(obj.__class__, '__str__') or obj.__class__.__str__ == object.__str__:
+            nome_classe = obj.__class__.__name__
+            raise NotImplementedError(
+                f"A classe '{nome_classe}' não implementa o método __str__() de forma personalizada.\n"
+                f"O decorator @debug_oo requer que a classe tenha uma representação textual própria.\n"
+                f"Por favor, implemente o método __str__ na classe {nome_classe}.\n\n"
+                f"Exemplo:\n"
+                f"    class {nome_classe}:\n"
+                f"        def __init__(self, atributo1):\n"
+                f"            self.atributo1 = atributo1\n"
+                f"        \n"
+                f"        def __str__(self):\n"
+                f"            return f'{nome_classe}(atributo1={{self.atributo1}})'"
+            )
+        
+        try:
+            obj_str = str(obj)
+        except Exception as e:
+            raise RuntimeError(
+                f"Erro ao chamar __str__() no objeto {obj.__class__.__name__}: {type(e).__name__}: {str(e)}"
+            ) from e
+        
         if len(obj_str) > 80:
             obj_str = obj_str[:77] + "..."
         
@@ -227,7 +250,12 @@ def debug_oo(metodo):
         try:
             resultado = metodo(*args, **kwargs)
             
-            estado_atual = str(obj)
+            try:
+                estado_atual = str(obj)
+            except Exception as e:
+                print(f"   [{timestamp}]    AVISO: Não foi possível obter novo estado ({type(e).__name__})")
+                estado_atual = "<erro ao obter estado>"
+            
             if len(estado_atual) > 80:
                 estado_atual = estado_atual[:77] + "..."
             
